@@ -5,14 +5,20 @@ from simple_rest import Resource
 
 from realestate.core.models import Object, Adv
 
+import json
+
+
 class VCardResource(Resource):
     """
         Represents an Object resource.
-        
     """
 
     def get(self, request, vcard_id=None, **kwargs):
-
+        """
+            Returns the VCard resource that matches the 
+            recieved `vcard_id`.
+            Otherwise, returns the list of all VCards.
+        """
         json_serializer = serializers.get_serializer('json')()
         if vcard_id:
             advs = json_serializer.serialize(Object.objects.filter(id=vcard_id))
@@ -24,10 +30,10 @@ class VCardResource(Resource):
     def post(self, request, *args, **kwargs):
         # Uses request.user to prevent creating
         # resources on behalf of other users.
-        
-        adv_id = request.POST.get('advID')
-        key_feature = request.POST.get('keyFeature')
-        value_feature = request.POST.get('valueFeature')
+        data = json.loads(request.body)
+        adv_id = data.get('adv_id')
+        key_feature = data.get('key_feature')
+        value_feature = data.get('value_feature')
 
         try:
             adv = Adv.objects.get(id=adv_id)
@@ -38,9 +44,28 @@ class VCardResource(Resource):
             return HttpResponse(status=500)
             
 
+
+    def put(self, request, vcard_id, *args, **kwargs):
+        """
+            Updates the model:
+            Iterates through the `**kwargs`` and 
+            updates the attributes.
+        """
+        data = request.PUT.dict()
+        vcard = Object.objects.get(id=vcard_id)
+        for attr, value in data.iteritems():
+            setattr(vcard, attr, value)
+
+        vcard.save()
+        return HttpResponse(status=200)
+
+
+
+
+
     def delete(self, request, vcard_id):
         # Checks if the user in the request 
-        # is the owner of the adv. If True, removes
+        # is the owner of the vcard. If True, removes
         # the Object that matches the provided `vcard_id`.
 
         user = request.user

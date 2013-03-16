@@ -4,7 +4,7 @@ from django.utils import timezone
 
 class Adv(models.Model):
     date = models.DateField()
-    type = models.BooleanField()
+    type = models.IntegerField()
     price = models.IntegerField()
 
     user = models.ForeignKey('User')
