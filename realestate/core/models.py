@@ -21,15 +21,25 @@ class Object(models.Model):
         return "adv(%s) %s:%s" % (str(self.adv.id), self.key_feature, self.value_feature)
 
 
-
-class DesiredVCard(models.Model):
+class VCard(models.Model):
     """
-        Represents the desired vcards that 
-        the user can save.
+        Represents a virtual card: desired 
+    """
+    vcard_name = models.CharField(max_length=20L)
+    date = models.DateField()
+
+    user = models.ForeignKey('User')
+
+
+class VCardRequirement(models.Model):
+    """
+        Represent the features of the virtual card.
     """
 
     key_feature = models.CharField(max_length=20L)
     value_feature = models.CharField(max_length=20L)
+
+    vcard = models.ForeignKey(VCard)
 
     def __unicode__(self):
         return "%s:%s" % (self.key_feature, self.value_feature)

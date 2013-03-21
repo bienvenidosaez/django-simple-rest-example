@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, include, url
 
-from realestate.core.api import auth, user, adv, vcard, friend, message
+from realestate.core.api import auth, user, adv, object, friend, message
 
 
 urlpatterns = patterns('',
@@ -23,9 +23,9 @@ urlpatterns = patterns('',
     url(r'^adv/(?P<adv_id>[^/]+)/?$', adv.AdvResource.as_view()),
 
     # Virtual Card resource
-    url(r'^vcard/?$', vcard.VCardResource.as_view()),
-    url(r'^vcard/search/?$', vcard.search),
-    url(r'^vcard/(?P<vcard_id>[^/]+)/?$', vcard.VCardResource.as_view()),
+    url(r'^object/?$', object.ObjectResource.as_view()),
+    url(r'^object/search/?$', object.search),
+    url(r'^object/(?P<object_id>[^/]+)/?$', object.ObjectResource.as_view()),
 
     # Messages resource URLs.
     url(r'^message/?$', message.MessageResource.as_view()),
