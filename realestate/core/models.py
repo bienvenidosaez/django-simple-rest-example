@@ -17,14 +17,45 @@ class Object(models.Model):
 
     adv = models.ForeignKey(Adv)
 
+    def __unicode__(self):
+        return "adv(%s) %s:%s" % (str(self.adv.id), self.key_feature, self.value_feature)
 
-class Contact(models.Model):
-    id_contact = models.IntegerField(primary_key=True)
-    id_adv = models.IntegerField()
-    id_user_ins = models.IntegerField()
-    id_user_read = models.IntegerField()
+
+
+class DesiredVCard(models.Model):
+    """
+        Represents the desired vcards that 
+        the user can save.
+    """
+
+    key_feature = models.CharField(max_length=20L)
+    value_feature = models.CharField(max_length=20L)
+
+    def __unicode__(self):
+        return "%s:%s" % (self.key_feature, self.value_feature)
+
+
+
+
+class Message(models.Model):
+    """
+        Represents a message sent from a reader to an adv
+        owner.
+            - adv : The adv in subject.
+            - user_ins: The owner of the adv and recipient of the message.
+            - user_read: The user interested in the adv and sender of the message.
+    """
+    adv = models.ForeignKey(Adv)
+    user_ins = models.ForeignKey('User', related_name='recipient')
+    user_read = models.ForeignKey('User', related_name='sender')
     date = models.DateField()
     message = models.TextField()
+
+    def __unicode__(self):
+        return "From: %s to: %s subject: %s" % \
+                    (self.user_read.username, self.user_ins.username, self.adv.id)
+
+
 
 class FriendList(models.Model):
     id_friend = models.IntegerField()
@@ -86,7 +117,7 @@ class User(AbstractBaseUser):
         default user model. (django.contrib.auth.models.User)
     """
     username = models.CharField(unique=True, max_length=20L)
-    email = models.CharField(max_length=20L)
+    email = models.CharField(max_length=40L)
     first_name = models.CharField(max_length=20L)
     last_name = models.CharField(max_length=20L)
     photo = models.CharField(max_length=50L)
@@ -98,3 +129,6 @@ class User(AbstractBaseUser):
 
     USERNAME_FIELD = 'username' # Identifies the user during authentication.
     REQUIRED_FIELD = ['first_name', 'last_name', 'email', 'password']
+
+
+

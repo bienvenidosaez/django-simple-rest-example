@@ -13,7 +13,9 @@ def register(request):
        Authenticates the user after registration.  
     """
 
+    print json.loads(request.body)
     data = json.loads(request.body)
+
     username = data.get('username')
     first_name = data.get('first_name')
     last_name = data.get('last_name')
@@ -34,7 +36,8 @@ def register(request):
             if user.is_active:
                 login(request, user)
 
-    except:
+    except Exception, e:
+        print e
         return HttpResponse(status=500)
 
     return HttpResponse(status=201)
