@@ -47,8 +47,9 @@ def login_view(request):
         Authenticates a user with username and 
         password.
     """
-    username = request.POST.get('username')
-    password = request.POST.get('password')
+    data = json.loads(request.body)
+    username = data.get('username')
+    password = data.get('password')
     user = authenticate(username=username, password=password)
     
     if user is not None:

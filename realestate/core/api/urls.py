@@ -24,5 +24,7 @@ urlpatterns = patterns('',
 
     # Virtual Card resource
     url(r'^vcard/?$', vcard.VCardResource.as_view()),
+    url(r'^vcard/search/?$', vcard.search),
     url(r'^vcard/(?P<vcard_id>[^/]+)/?$', vcard.VCardResource.as_view()),
+
 )

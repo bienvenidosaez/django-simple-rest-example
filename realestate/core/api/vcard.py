@@ -1,11 +1,31 @@
 from django.http import HttpResponse
 from django.core import serializers
+from django.views.decorators.csrf import csrf_exempt
 
 from simple_rest import Resource
 
 from realestate.core.models import Object, Adv
 
 import json
+
+
+
+@csrf_exempt
+def search(request):
+    """
+        Returns vcards that match the criteria (key/value pairs) 
+        sent in JSON format. 
+    """
+    json_serializer = serializers.get_serializer('json')()
+    data = json.loads(request.body)
+    response = []
+    for key, value in data.iteritems():
+        response += Object.objects.filter(key_feature=key, value_feature=value)
+
+    response = json_serializer.serialize(response)
+    return HttpResponse(response, content_type="application/json", status=200)
+
+
 
 
 class VCardResource(Resource):
@@ -37,8 +57,14 @@ class VCardResource(Resource):
 
         try:
             adv = Adv.objects.get(id=adv_id)
-            Object.objects.create(adv=adv, key_feature=key_feature, value_feature=value_feature)
-            return HttpResponse(status=201)
+
+            # Dont allow users to add vcards of adv
+            # that they don't own.
+            if adv.user == request.user:
+                Object.objects.create(adv=adv, key_feature=key_feature, value_feature=value_feature)
+                return HttpResponse(status=201)
+            else:
+                return HttpResponse(status=401)
         except Exception, e:
             print e
             return HttpResponse(status=500)
