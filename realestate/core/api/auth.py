@@ -13,7 +13,6 @@ def register(request):
        Authenticates the user after registration.  
     """
 
-    print json.loads(request.body)
     data = json.loads(request.body)
 
     username = data.get('username')

@@ -4,10 +4,10 @@ from django.views.decorators.csrf import csrf_exempt
 
 from simple_rest import Resource
 
-from realestate.core.models import Object, Adv
+from realestate.core.models import VCard, Adv
 
 import json
-
+from datetime import datetime
 
 
 @csrf_exempt
@@ -20,7 +20,7 @@ def search(request):
     data = json.loads(request.body)
     response = []
     for key, value in data.iteritems():
-        response += Object.objects.filter(key_feature=key, value_feature=value)
+        response += VCard.objects.filter(key_feature=key, value_feature=value)
 
     response = json_serializer.serialize(response)
     return HttpResponse(response, content_type="application/json", status=200)
@@ -30,7 +30,7 @@ def search(request):
 
 class VCardResource(Resource):
     """
-        Represents an Object resource.
+        Represents an VCard resource.
     """
 
     def get(self, request, vcard_id=None, **kwargs):
@@ -41,33 +41,28 @@ class VCardResource(Resource):
         """
         json_serializer = serializers.get_serializer('json')()
         if vcard_id:
-            advs = json_serializer.serialize(Object.objects.filter(id=vcard_id))
+            advs = json_serializer.serialize(VCard.objects.filter(id=vcard_id))
         else:
-            advs = json_serializer.serialize(Object.objects.all())
+            advs = json_serializer.serialize(VCard.objects.all())
         return HttpResponse(advs, content_type='application/json', status=200)
 
 
     def post(self, request, *args, **kwargs):
         # Uses request.user to prevent creating
         # resources on behalf of other users.
+        
         data = json.loads(request.body)
-        adv_id = data.get('adv_id')
-        key_feature = data.get('key_feature')
-        value_feature = data.get('value_feature')
+        vcard_name = data.get('vcard_name')
+        user = request.user
 
-        try:
-            adv = Adv.objects.get(id=adv_id)
+        vcard = VCard.objects.create(
+                vcard_name = vcard_name,
+                date = datetime.now(),
+                user = user
+            )
 
-            # Dont allow users to add vcards of adv
-            # that they don't own.
-            if adv.user == request.user:
-                Object.objects.create(adv=adv, key_feature=key_feature, value_feature=value_feature)
-                return HttpResponse(status=201)
-            else:
-                return HttpResponse(status=401)
-        except Exception, e:
-            print e
-            return HttpResponse(status=500)
+        return HttpResponse(status=201)
+        
             
 
 
@@ -78,7 +73,7 @@ class VCardResource(Resource):
             updates the attributes.
         """
         data = request.PUT.dict()
-        vcard = Object.objects.get(id=vcard_id)
+        vcard = VCard.objects.get(id=vcard_id)
         for attr, value in data.iteritems():
             setattr(vcard, attr, value)
 
@@ -92,11 +87,11 @@ class VCardResource(Resource):
     def delete(self, request, vcard_id):
         # Checks if the user in the request 
         # is the owner of the vcard. If True, removes
-        # the Object that matches the provided `vcard_id`.
+        # the VCard that matches the provided `vcard_id`.
 
         user = request.user
         try:
-            vcard = Object.objects.get(id=vcard_id)
+            vcard = VCard.objects.get(id=vcard_id)
             if vcard.adv.user == user:
                 vcard.delete()
                 return HttpResponse(status=200)
