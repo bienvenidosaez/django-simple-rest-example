@@ -48,9 +48,10 @@ class VCardResource(Resource):
 
 
     def post(self, request, *args, **kwargs):
-        # Uses request.user to prevent creating
-        # resources on behalf of other users.
-        
+        """
+            Uses request.user to prevent creating
+            resources on behalf of other users.
+        """
         data = json.loads(request.body)
         vcard_name = data.get('vcard_name')
         user = request.user
@@ -85,10 +86,11 @@ class VCardResource(Resource):
 
 
     def delete(self, request, vcard_id):
-        # Checks if the user in the request 
-        # is the owner of the vcard. If True, removes
-        # the VCard that matches the provided `vcard_id`.
-
+        """
+            Checks if the user in the request 
+            is the owner of the vcard. If True, removes
+            the VCard that matches the provided `vcard_id`.
+        """
         user = request.user
         try:
             vcard = VCard.objects.get(id=vcard_id)

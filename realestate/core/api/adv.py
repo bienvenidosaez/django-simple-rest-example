@@ -29,8 +29,12 @@ class AdvResource(Resource):
 
 
     def post(self, request, *args, **kwargs):
-        # Uses request.user to prevent creating
-        # resources on behalf of other users.
+        """ 
+            Uses request.user to prevent creating
+            resources on behalf of other users.
+        """
+
+
         data = json.loads(request.body)
         print data.get('obj')
         user = request.user
@@ -57,18 +61,21 @@ class AdvResource(Resource):
         data = json.loads(request.body)
         adv = Adv.objects.get(id=adv_id)
         for attr, value in data.iteritems():
-            print value
-            setattr(adv, attr, value)
+            if attr == 'obj':
+                pass   
+            else:
+                setattr(adv, attr, value)
 
         adv.save()
         return HttpResponse(status=200)
         
 
     def delete(self, request, adv_id):
-        # Checks if the user in the request 
-        # is the owner of the adv. If True, removes
-        # the Adv that matches the provided `adv_id`.
-
+        """
+            Checks if the user in the request 
+            is the owner of the adv. If True, removes
+            the Adv that matches the provided `adv_id`.
+        """
         user = request.user
         adv = Adv.objects.get(id=adv_id)
         if adv.user == user:

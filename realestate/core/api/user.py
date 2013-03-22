@@ -25,14 +25,14 @@ class UserResource(Resource):
         return HttpResponse(users, content_type='application/json', status=200)
 
     
-    def put(self, request, username,*args, **kwargs):
+    def put(self, request, *args, **kwargs):
         """
             Updates the model:
             Iterates through the `**kwargs`` and 
             updates the attributes.
         """
         data = json.loads(request.body)
-        user = User.objects.get(username=username)
+        user = request.user
         for attr, value in data.iteritems():
             setattr(user, attr, value)
 
@@ -43,11 +43,11 @@ class UserResource(Resource):
 
 
 
-    def delete(self, request, username):
+    def delete(self, request):
         """
             Deletes the user that matches `username`.
         """
-        user = User.objects.get(username=username)
-        user.delete()
+        
+        request.user.delete()
         return HttpResponse(status=200)
 

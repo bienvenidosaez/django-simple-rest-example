@@ -3,6 +3,9 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils import timezone
 
 class Adv(models.Model):
+    """
+        Represents a real estate ad.
+    """
     date = models.DateField()
     type = models.IntegerField()
     price = models.IntegerField()
@@ -11,7 +14,10 @@ class Adv(models.Model):
     obj = models.ManyToManyField('Object')
 
 class Object(models.Model):
-
+    """
+        Represents the features of a real estate
+        ad (Adv)
+    """
     key_feature = models.CharField(max_length=20L)
     value_feature = models.CharField(max_length=20L)
 
@@ -29,15 +35,15 @@ class VCard(models.Model):
     user = models.ForeignKey('User')
     requirements =  models.ManyToManyField('VCardRequirement')
 
+
+
 class VCardRequirement(models.Model):
     """
-        Represent features of a virtual card.
+        Represent features of a virtual card (VCard).
     """
 
     key_feature = models.CharField(max_length=20L)
     value_feature = models.CharField(max_length=20L)
-
-    # vcard = models.OneToOneField(VCard)
 
     def __unicode__(self):
         return "%s:%s" % (self.key_feature, self.value_feature)

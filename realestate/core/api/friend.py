@@ -27,8 +27,10 @@ class FriendResource(Resource):
 
 
     def post(self, request, *args, **kwargs):
-        # Uses request.user to prevent creating
-        # resources on behalf of other users.
+        """
+            Uses request.user to prevent creating
+            resources on behalf of other users.
+        """
         
         data = json.loads(request.body)
 
@@ -53,7 +55,7 @@ class FriendResource(Resource):
             updates the attributes.
         """
 
-        data =  request.PUT.dict()
+        data = json.loads(request.body)
         friend = FriendList.objects.get(id=friend_id)
         for attr, value in data.iteritems():
             print value
@@ -64,9 +66,11 @@ class FriendResource(Resource):
         
 
     def delete(self, request, friend_id):
-        # Checks if the user in the request 
-        # is the owner of the friend. If True, removes
-        # the FriendList that matches the provided `friend_id`.
+        """
+            Checks if the user in the request 
+            is the owner of the friend. If True, removes
+            the FriendList that matches the provided `friend_id`.
+        """
 
         user = request.user
         friend = FriendList.objects.get(id=friend_id)
