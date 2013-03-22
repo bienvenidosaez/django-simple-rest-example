@@ -131,6 +131,10 @@ INSTALLED_APPS = (
 # Custom User model for authentication.
 AUTH_USER_MODEL = 'core.User'
 
+# Wadofstuff for custom serialization.
+SERIALIZATION_MODULES = {
+    'json': 'wadofstuff.django.serializers.json'
+}
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

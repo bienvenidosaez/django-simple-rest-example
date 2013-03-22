@@ -41,10 +41,10 @@ class VCardResource(Resource):
         """
         json_serializer = serializers.get_serializer('json')()
         if vcard_id:
-            advs = json_serializer.serialize(VCard.objects.filter(id=vcard_id))
+            vcard = serializers.serialize("json", VCard.objects.filter(id=vcard_id), relations=('requirements',))
         else:
-            advs = json_serializer.serialize(VCard.objects.all())
-        return HttpResponse(advs, content_type='application/json', status=200)
+            vcard = serializers.serialize("json", VCard.objects.all(), relations=('requirements',))
+        return HttpResponse(vcard, content_type='application/json', status=200)
 
 
     def post(self, request, *args, **kwargs):
@@ -72,7 +72,7 @@ class VCardResource(Resource):
             Iterates through the `**kwargs`` and 
             updates the attributes.
         """
-        data = request.PUT.dict()
+        data = json.loads(request.body)
         vcard = VCard.objects.get(id=vcard_id)
         for attr, value in data.iteritems():
             setattr(vcard, attr, value)

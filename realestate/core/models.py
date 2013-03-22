@@ -8,14 +8,12 @@ class Adv(models.Model):
     price = models.IntegerField()
 
     user = models.ForeignKey('User')
-
+    obj = models.ManyToManyField('Object')
 
 class Object(models.Model):
 
     key_feature = models.CharField(max_length=20L)
     value_feature = models.CharField(max_length=20L)
-
-    adv = models.ForeignKey(Adv)
 
     def __unicode__(self):
         return "adv(%s) %s:%s" % (str(self.adv.id), self.key_feature, self.value_feature)
@@ -23,23 +21,23 @@ class Object(models.Model):
 
 class VCard(models.Model):
     """
-        Represents a virtual card: desired 
+        Represents a virtual card (desired offers)
     """
     vcard_name = models.CharField(max_length=20L)
     date = models.DateField()
 
     user = models.ForeignKey('User')
-
+    requirements =  models.ManyToManyField('VCardRequirement')
 
 class VCardRequirement(models.Model):
     """
-        Represent the features of the virtual card.
+        Represent features of a virtual card.
     """
 
     key_feature = models.CharField(max_length=20L)
     value_feature = models.CharField(max_length=20L)
 
-    vcard = models.ForeignKey(VCard)
+    # vcard = models.OneToOneField(VCard)
 
     def __unicode__(self):
         return "%s:%s" % (self.key_feature, self.value_feature)

@@ -4,7 +4,7 @@ from django.utils import timezone
 
 from simple_rest import Resource
 
-from realestate.core.models import Adv
+from realestate.core.models import Adv, Object
 
 import json
 
@@ -22,9 +22,9 @@ class AdvResource(Resource):
         """
         json_serializer = serializers.get_serializer('json')()
         if adv_id:
-            advs = json_serializer.serialize(Adv.objects.filter(id=adv_id))
+            advs = serializers.serialize("json", Adv.objects.filter(id=adv_id), relations=('obj',))
         else:
-            advs = json_serializer.serialize(Adv.objects.all())
+            advs = serializers.serialize("json", Adv.objects.all(), relations=('obj',))
         return HttpResponse(advs, content_type='application/json', status=200)
 
 
@@ -32,12 +32,20 @@ class AdvResource(Resource):
         # Uses request.user to prevent creating
         # resources on behalf of other users.
         data = json.loads(request.body)
+        print data.get('obj')
         user = request.user
         adv_type = data.get('type')
         price = data.get('price')
 
-        Adv.objects.create(user=user, type=adv_type, price=price, date=timezone.now())
+        adv = Adv.objects.create(user=user, type=adv_type, price=price, date=timezone.now())
+        for o in data.get('obj'):
+            obj = Object.objects.create(
+                key_feature=o.get('key_feature'),
+                value_feature= o.get('value_feature')
+                )
 
+            adv.obj.add(obj)
+            adv.save()
         return HttpResponse(status=201)
 
     def put(self, request, adv_id,*args, **kwargs):
@@ -46,8 +54,7 @@ class AdvResource(Resource):
             Iterates through the `**kwargs`` and 
             updates the attributes.
         """
-
-        data =  request.PUT.dict()
+        data = json.loads(request.body)
         adv = Adv.objects.get(id=adv_id)
         for attr, value in data.iteritems():
             print value

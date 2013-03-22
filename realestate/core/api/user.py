@@ -31,7 +31,7 @@ class UserResource(Resource):
             Iterates through the `**kwargs`` and 
             updates the attributes.
         """
-        data =  request.PUT.dict()
+        data = json.loads(request.body)
         user = User.objects.get(username=username)
         for attr, value in data.iteritems():
             setattr(user, attr, value)
